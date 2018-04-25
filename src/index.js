@@ -3,9 +3,9 @@
 let Sequelize = require('sequelize');
 
 let enumProperty = attribute => {
-    return {
-      enum: attribute.values
-    }
+  return {
+    enum: attribute.values
+  }
 }
 
 let property = (attribute, options) => {
@@ -29,7 +29,7 @@ let property = (attribute, options) => {
 
   if (type instanceof Sequelize.DATEONLY) { return { type: addNull ? ['string', 'null'] : 'string', format: 'date' }; }
   if (type instanceof Sequelize.DATE) { return { type: addNull ? ['string', 'null'] : 'string', format: 'date-time' }; }
-  if (type instanceof Sequelize.TIME) { return { type: addNull ? ['string', 'null'] : 'string'}; }
+  if (type instanceof Sequelize.TIME) { return { type: addNull ? ['string', 'null'] : 'string' }; }
 
   if (type instanceof Sequelize.UUID
     || type instanceof Sequelize.UUIDV1
@@ -45,7 +45,7 @@ let property = (attribute, options) => {
     || type instanceof Sequelize.DATEONLY
     || type instanceof Sequelize.TIME) {
 
-    const schema = {type: addNull ? ['string', 'null'] : 'string'};
+    const schema = { type: addNull ? ['string', 'null'] : 'string' };
 
     var maxLength = (type.options && type.options.length) || type._length;
 
@@ -66,11 +66,16 @@ let property = (attribute, options) => {
 
   if (type instanceof Sequelize.JSON
     || type instanceof Sequelize.JSONB) {
-    return { type: 'any' };
+    return { type: addNull ? ['object', 'null'] : 'object' };
   }
 
   if (type instanceof Sequelize.VIRTUAL) {
-    return type.returnType ? property({ type: type.returnType, allowNull: type.allowNull }, options) : { type: addNull ? ['string', 'null'] : 'string'};
+    return type.returnType ? property({ type: type.returnType, allowNull: type.allowNull }, options) : { type: addNull ? ['string', 'null'] : 'string' };
+  }
+
+  // part of https://gist.github.com/fge/4606371
+  if (type instanceof Sequelize.GEOMETRY) {
+    return { type: 'object', properties: { type: { enum: ['Point'] }, coordinates: { type: 'array', items: { type: 'number' } } } }
   }
 
   // Need suport for the following
@@ -79,7 +84,6 @@ let property = (attribute, options) => {
   // BLOB
   // RANGE
   // ARRAY
-  // GEOMETRY
   // GEOGRAPHY
 
   console.log(`Unable to convert ${type.key || type.toSql()} to a schema property`);
@@ -106,7 +110,7 @@ module.exports = (model, options) => {
   let exclude = options.exclude || options.private || [];
   let attributes = options.attributes || Object.keys(model.rawAttributes);
 
-  for(let attributeName of attributes) {
+  for (let attributeName of attributes) {
 
     if (exclude.indexOf(attributeName) >= 0) {
       continue;

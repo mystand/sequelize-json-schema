@@ -180,6 +180,20 @@ describe('sequelize-json-schema', () => {
       expect(def.properties.secret.maxLength).to.equal(40);
     });
 
+    it('should return valid object for geometry', () => {
+      let Simple = sequelize.define('simple', {
+        point: Sequelize.GEOMETRY
+      });
+
+      let def = definition(Simple);
+
+      expect(def.properties.point).to.exist;
+      expect(def.properties.point.type).to.equal('object');
+      expect(def.properties.point.properties.type.enum[0]).to.equal('Point');
+      expect(def.properties.point.properties.coordinates.type).to.equal('array');
+    });
+
+
   });
 
 
