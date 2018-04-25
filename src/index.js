@@ -66,7 +66,7 @@ let property = (attribute, options) => {
 
   if (type instanceof Sequelize.JSON
     || type instanceof Sequelize.JSONB) {
-    return { type: ['object', 'null'] };
+    return { type: addNull ? ['object', 'null'] : 'object' };
   }
 
   if (type instanceof Sequelize.VIRTUAL) {
