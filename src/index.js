@@ -73,6 +73,7 @@ let property = (attribute, options) => {
     return type.returnType ? property({ type: type.returnType, allowNull: type.allowNull }, options) : { type: addNull ? ['string', 'null'] : 'string' };
   }
 
+  // part of https://gist.github.com/fge/4606371
   if (type instanceof Sequelize.GEOMETRY) {
     return { type: 'object', properties: { type: { enum: ['Point'] }, coordinates: { type: 'array', items: { type: 'number' } } } }
   }
